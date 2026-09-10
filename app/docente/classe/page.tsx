@@ -1,2 +1,5 @@
 import Dashboard from "./Dashboard";
-export default function Page(){return <Dashboard/>}
+import GestioneClasse from "./GestioneClasse";
+import Link from "next/link";
+
+export default function Page(){return <main className="min-h-screen px-5 py-8 md:px-8"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm uppercase tracking-[.2em] text-neutral-500">Area docente</p><h1 className="mt-2 text-4xl font-semibold">La classe in numeri</h1></div><div className="flex gap-2 print:hidden"><Link href="/docente/mappa" className="rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm">🕸️ Mappa</Link><Link href="/docente/indovina" className="rounded-xl bg-black px-4 py-2 text-sm text-white">🕵️ Indovina</Link></div></div><Dashboard/><div className="mt-10 print:hidden"><div className="mb-5"><p className="text-sm uppercase tracking-[.2em] text-neutral-500">Amministrazione</p><h2 className="mt-2 text-3xl font-semibold">Gestione classe</h2></div><GestioneClasse/></div></div></main>}
