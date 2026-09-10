@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ArrowLeft, KeyRound, Settings2 } from "lucide-react";
 import GestioneClasse from "../GestioneClasse";

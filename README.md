@@ -30,3 +30,8 @@ Non serve cambiare lo schema del database: viene utilizzato il campo `studenti.c
 4. Per cambiare classe basta usare nuovamente il menu in alto.
 
 Se non è ancora presente nessuna classe, entrare in **Gestione classe**, digitare il nome della nuova classe e aggiungere gli studenti.
+
+
+## FIX build
+
+Aggiunto `"use client"` a `app/docente/classe/gestione/page.tsx` perché usa `useTeacherClass()` e quindi deve essere un Client Component.
