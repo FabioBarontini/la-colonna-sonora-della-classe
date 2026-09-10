@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import { Music2, LockKeyhole, Sparkles, Radio, ArrowRight } from "lucide-react";
 
 export default function Home() {
@@ -29,7 +30,18 @@ export default function Home() {
       </section>
 
       <section id="come-funziona" className="mt-28 grid gap-5 md:grid-cols-3">
-        {[["01","Scegli","Inserisci da 5 a 10 canzoni che vuoi lasciare alla tua classe.",Music2],["02","Racconta","Per ogni brano puoi spiegare perché significa qualcosa per te.",Sparkles],["03","Scopri","La playlist diventa una mappa di gusti, incontri e somiglianze.",Radio]].map(([n,t,d,I])=>{const Icon=I as any;return <div key={n} className="glass p-7"><div className="text-xs font-mono text-violet-300">{n}</div><Icon className="mt-8 text-cyan-300" size={22}/><h2 className="mt-5 text-2xl font-bold">{t}</h2><p className="mt-2 leading-7 muted">{d as string}</p></div>})}
+        {([
+          ["01", "Scegli", "Inserisci da 5 a 10 canzoni che vuoi lasciare alla tua classe.", Music2],
+          ["02", "Racconta", "Per ogni brano puoi spiegare perché significa qualcosa per te.", Sparkles],
+          ["03", "Scopri", "La playlist diventa una mappa di gusti, incontri e somiglianze.", Radio]
+        ] as [string, string, string, LucideIcon][]).map(([n, t, d, Icon]) => (
+          <div key={n} className="glass p-7">
+            <div className="text-xs font-mono text-violet-300">{n}</div>
+            <Icon className="mt-8 text-cyan-300" size={22}/>
+            <h2 className="mt-5 text-2xl font-bold">{t}</h2>
+            <p className="mt-2 leading-7 muted">{d}</p>
+          </div>
+        ))}
       </section>
       <footer className="py-16 text-center text-xs text-[#77798d]">La colonna sonora della classe · progetto didattico</footer>
     </div>
