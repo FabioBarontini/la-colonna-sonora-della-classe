@@ -1,2 +1,15 @@
-import Dashboard from "./Dashboard"; import GestioneClasse from "./GestioneClasse"; import Link from "next/link"; import {Map, Sparkles} from "lucide-react";
-export default function Page(){return <main className="min-h-screen py-8 md:py-10"><div className="container"><div className="flex flex-wrap items-end justify-between gap-5"><div><div className="eyebrow">Area docente</div><h1 className="mt-2 text-5xl font-black tracking-[-.05em]">La classe, <span className="gradient-text">in musica.</span></h1><p className="mt-3 max-w-2xl muted">Una panoramica viva delle playlist che stanno costruendo la colonna sonora della classe.</p></div><div className="flex gap-2 print-hidden"><Link href="/docente/mappa" className="btn-ghost"><Map size={16}/> Mappa</Link><Link href="/docente/indovina" className="btn-primary"><Sparkles size={16}/> Indovina</Link></div></div><Dashboard/><div className="mt-14 print-hidden"><div><div className="eyebrow">Amministrazione</div><h2 className="mt-2 text-3xl font-black">Gestione classe</h2><p className="mt-2 muted">Crea gli accessi personali e stampa i codici da consegnare agli studenti.</p></div><GestioneClasse/></div></div></main>}
+import Link from "next/link";
+import { ArrowRight, Music2, Settings2 } from "lucide-react";
+import Dashboard from "./Dashboard";
+import TeacherNav from "../components/TeacherNav";
+
+export default function Page(){return <main className="min-h-screen py-7 md:py-9"><div className="container">
+  <TeacherNav/>
+  <div className="mt-10 flex flex-wrap items-end justify-between gap-5"><div><div className="eyebrow">Area docente</div><h1 className="mt-2 text-5xl font-black tracking-[-.05em]">La classe, <span className="gradient-text">in musica.</span></h1><p className="mt-3 max-w-2xl muted">La playlist prende forma: dati, storie, connessioni e tutto quello che sta emergendo dalla classe.</p></div><Link href="/docente/classe/gestione" className="btn-primary print-hidden"><Settings2 size={16}/> Gestisci la classe <ArrowRight size={15}/></Link></div>
+  <Dashboard/>
+  <div className="mt-7 grid gap-5 md:grid-cols-3 print-hidden">
+    <Link href="/docente/mappa" className="glass-soft p-5 hover:border-violet-400/30"><Music2 className="text-cyan-300" size={20}/><div className="mt-4 font-bold">Esplora la mappa</div><p className="mt-1 text-sm muted">Scopri chi condivide gusti musicali.</p></Link>
+    <Link href="/docente/indovina" className="glass-soft p-5 hover:border-violet-400/30"><span className="text-xl">✦</span><div className="mt-4 font-bold">Gioca con la classe</div><p className="mt-1 text-sm muted">Indovina chi ha scelto il brano.</p></Link>
+    <Link href="/docente/classe/gestione" className="glass-soft p-5 hover:border-violet-400/30"><Settings2 className="text-violet-300" size={20}/><div className="mt-4 font-bold">Pannello amministratore</div><p className="mt-1 text-sm muted">Studenti, codici personali e stampa.</p></Link>
+  </div>
+</div></main>}

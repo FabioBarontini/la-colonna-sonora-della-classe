@@ -1,34 +1,35 @@
-# La colonna sonora della classe — aggiornamento WOW
+# Patch WOW 2 — player reale + pannello amministratore
 
-Patch per il progetto già presente su GitHub.
+Questa patch si applica al progetto già funzionante.
 
-## Cosa cambia
-- Playlist studente da 5 a 10 brani.
-- Modifica dei brani già salvati.
-- Aggiunta e rimozione dei brani, mantenendo il minimo di 5.
-- Salvataggio sincronizzato della playlist.
-- Nuova grafica dark/musicale con gradienti, glassmorphism, waveform e music cards.
-- Home completamente ridisegnata.
-- Pagina studente ridisegnata.
-- Dashboard docente ridisegnata.
-- Mappa musicale ridisegnata.
-- Gioco "Indovina il compagno" ridisegnato.
-- Login docente ridisegnato.
-- Gestione classe ridisegnata.
+## Nuove funzioni
+- Home con player **NOW PLAYING** reale: sceglie casualmente un brano dal database `canzoni`.
+- Riproduzione tramite player YouTube incorporato, con controlli e pausa indipendente su ogni browser.
+- Il browser ricorda l'ultimo brano e lo stato pausa/riproduzione tramite localStorage.
+- Pulsante **Cambia brano** per estrarre un'altra canzone casuale.
+- Pulsante **Pannello docente** più evidente nella home.
+- Nuova barra di navigazione WOW nell'area docente.
+- Nuovo percorso `/docente/classe/gestione` per il pannello amministratore.
+- Gestione classe separata dal dashboard, con codici personali e stampa.
+- La nuova area gestione è protetta dal middleware Supabase.
+- Mappa musicale e gioco `Indovina` mantengono il design WOW e ora condividono la navigazione docente.
+- La sezione **Come funziona** della home è stata resa più chiara e raggiungibile con scroll.
 
-## Importante
-Questa è una PATCH, non un progetto completo.
+## File da copiare nel repository GitHub
+Copia mantenendo le cartelle:
 
-NON sostituire l'intero repository con lo ZIP.
-
-Copia i file della patch nelle rispettive cartelle del repository GitHub e fai un unico commit su `main`.
-
-Non modificare:
-- `tsconfig.json`
+- `app/page.tsx`
+- `app/globals.css`
+- `app/components/NowPlaying.tsx`
+- `app/api/now-playing/route.ts`
+- `app/docente/components/TeacherNav.tsx`
+- `app/docente/classe/page.tsx`
+- `app/docente/classe/gestione/page.tsx`
+- `app/docente/mappa/page.tsx`
+- `app/docente/indovina/page.tsx`
 - `middleware.ts`
-- variabili Vercel
-- configurazione Supabase
-- schema del database
-- `app/api/student/route.ts` (la versione attuale è già compatibile con la playlist)
 
-La nuova API `/api/submissions` sincronizza la playlist: aggiorna i brani esistenti, inserisce quelli nuovi ed elimina quelli rimossi dall'utente, mantenendo sempre 5–10 brani.
+Non modificare variabili Vercel, Supabase o `tsconfig.json`.
+
+## Nota
+Il player usa i link YouTube già presenti nel database. L'autoplay con audio può essere bloccato dalle impostazioni del browser: in quel caso basta premere **Ascolta**. Questo è un comportamento normale dei browser moderni.

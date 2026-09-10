@@ -29,4 +29,4 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ["/docente", "/docente/classe", "/docente/mappa", "/docente/indovina", "/api/songs", "/api/class/:path*"] };
+export const config = { matcher: ["/docente", "/docente/classe/:path*", "/docente/mappa", "/docente/indovina", "/api/songs", "/api/class/:path*"] };
