@@ -13,13 +13,23 @@ export async function POST(req: Request) {
     const body = await req.json();
     const codice = String(body?.codice ?? "").trim().toUpperCase();
     if (!codice) return NextResponse.json({ error: "Inserisci il codice personale." }, { status: 400 });
+
     const supabase = db();
     const { data, error } = await supabase.from("studenti").select("id, nome, classe, attivo").eq("codice_personale", codice).maybeSingle();
     if (error) throw error;
     if (!data || !data.attivo) return NextResponse.json({ error: "Codice non riconosciuto." }, { status: 404 });
-    const { data: song, error: songError } = await supabase.from("canzoni").select("id, titolo, artista, youtube_url, motivo").eq("studente_id", data.id).maybeSingle();
+
+    const { data: songs, error: songError } = await supabase
+      .from("canzoni")
+      .select("id, titolo, artista, youtube_url, motivo")
+      .eq("studente_id", data.id)
+      .order("created_at", { ascending: true });
     if (songError) throw songError;
-    return NextResponse.json({ student: { id: data.id, nome: data.nome, classe: data.classe }, hasSong: Boolean(song), song: song ?? null });
+
+    return NextResponse.json({
+      student: { id: data.id, nome: data.nome, classe: data.classe },
+      songs: songs ?? [],
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Errore del server." }, { status: 500 });
