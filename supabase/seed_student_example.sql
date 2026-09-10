@@ -1,0 +1,4 @@
+-- ESEMPIO DI STUDENTE DI PROVA. Lasciato commentato intenzionalmente.
+-- Quando saremo pronti, useremo una procedura per importare tutta la classe.
+-- insert into public.studenti (nome, codice_personale, classe)
+-- values ('Nome Studente', '5A-7K2', '5AINT');
