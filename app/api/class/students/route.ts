@@ -1,43 +1,6 @@
 import { NextResponse } from "next/server";
-import { createSupabaseAdmin } from "@/lib/supabase-admin";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
-
-function makeCode(index:number) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for (let i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
-  return s;
-}
-async function requireTeacher() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
-
-export async function GET() {
-  if (!await requireTeacher()) return NextResponse.json({ error:"Non autorizzato" }, {status:401});
-  const db=createSupabaseAdmin();
-  const {data,error}=await db.from("studenti").select("id,nome,codice_personale,classe,attivo,created_at,canzoni(id,titolo)").order("nome");
-  if(error) return NextResponse.json({error:error.message},{status:500});
-  return NextResponse.json({students:data||[]});
-}
-
-export async function POST(req:Request) {
-  if (!await requireTeacher()) return NextResponse.json({ error:"Non autorizzato" }, {status:401});
-  const body=await req.json();
-  const classe=String(body?.classe||"").trim();
-  const raw=String(body?.nomi||"");
-  const names=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  if(!classe || !names.length) return NextResponse.json({error:"Inserisci classe ed elenco studenti."},{status:400});
-  const db=createSupabaseAdmin();
-  const rows=[] as {nome:string;codice_personale:string;classe:string}[];
-  const used=new Set<string>();
-  for(const nome of names){
-    let code="";
-    do { code=`${classe.replace(/\s+/g,"").toUpperCase()}-${makeCode(rows.length)}`; } while(used.has(code));
-    used.add(code); rows.push({nome,codice_personale:code,classe});
-  }
-  const {data,error}=await db.from("studenti").insert(rows).select("id,nome,codice_personale,classe,attivo,created_at");
-  if(error) return NextResponse.json({error:error.message},{status:500});
-  return NextResponse.json({students:data||[]});
-}
+import { createClient } from "@supabase/supabase-js";
+function db(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error("Supabase non configurato");return createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}})}
+function code(classe:string){const clean=classe.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8)||"CLASSE";const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";for(let i=0;i<4;i++)out+=chars[Math.floor(Math.random()*chars.length)];return `${clean}-${out}`}
+export async function GET(req:Request){try{const classe=new URL(req.url).searchParams.get("classe")?.trim();if(!classe)return NextResponse.json({error:"Classe non specificata."},{status:400});const supabase=db();const {data,error}=await supabase.from("studenti").select("id,nome,codice_personale,classe,attivo").eq("classe",classe).order("nome");if(error)throw error;const ids=(data??[]).map(x=>x.id);let songs:any[]=[];if(ids.length){const {data:sd,error:se}=await supabase.from("canzoni").select("id,studente_id,titolo").in("studente_id",ids).order("created_at",{ascending:true});if(se)throw se;songs=sd??[]}const by=new Map<string,any[]>();for(const song of songs){const list=by.get(song.studente_id)??[];list.push({id:song.id,titolo:song.titolo});by.set(song.studente_id,list)}return NextResponse.json({students:(data??[]).map(x=>({...x,canzoni:by.get(x.id)??[]}))})}catch(error){console.error(error);return NextResponse.json({error:"Errore nel caricamento degli studenti."},{status:500})}}
+export async function POST(req:Request){try{const body=await req.json();const classe=String(body?.classe??"").trim();const nomi=String(body?.nomi??"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!classe)return NextResponse.json({error:"Indica la classe."},{status:400});if(!nomi.length)return NextResponse.json({error:"Inserisci almeno uno studente."},{status:400});const supabase=db();const {data:existing,error:ee}=await supabase.from("studenti").select("nome").eq("classe",classe);if(ee)throw ee;const existingNames=new Set((existing??[]).map(x=>x.nome.toLowerCase()));const rows=[];for(const nome of [...new Set(nomi)]){if(existingNames.has(nome.toLowerCase()))continue;let codice="";for(let i=0;i<20;i++){const candidate=code(classe);const {data:found,error:fe}=await supabase.from("studenti").select("id").eq("codice_personale",candidate).maybeSingle();if(fe)throw fe;if(!found){codice=candidate;break}}if(!codice)throw new Error("Impossibile generare un codice unico.");rows.push({nome,codice_personale:codice,classe,attivo:true})}if(rows.length){const {error}=await supabase.from("studenti").insert(rows);if(error)throw error}return NextResponse.json({added:rows.length})}catch(error){console.error(error);return NextResponse.json({error:"Errore durante l'aggiunta degli studenti."},{status:500})}}

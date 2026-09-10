@@ -1,35 +1,32 @@
-# Patch WOW 2 — player reale + pannello amministratore
+# WOW4 — Area docente multi-classe
 
-Questa patch si applica al progetto già funzionante.
+Questa patch rende tutta l'area docente dipendente dalla **classe attiva**.
 
-## Nuove funzioni
-- Home con player **NOW PLAYING** reale: sceglie casualmente un brano dal database `canzoni`.
-- Riproduzione tramite player YouTube incorporato, con controlli e pausa indipendente su ogni browser.
-- Il browser ricorda l'ultimo brano e lo stato pausa/riproduzione tramite localStorage.
-- Pulsante **Cambia brano** per estrarre un'altra canzone casuale.
-- Pulsante **Pannello docente** più evidente nella home.
-- Nuova barra di navigazione WOW nell'area docente.
-- Nuovo percorso `/docente/classe/gestione` per il pannello amministratore.
-- Gestione classe separata dal dashboard, con codici personali e stampa.
-- La nuova area gestione è protetta dal middleware Supabase.
-- Mappa musicale e gioco `Indovina` mantengono il design WOW e ora condividono la navigazione docente.
-- La sezione **Come funziona** della home è stata resa più chiara e raggiungibile con scroll.
+## Cosa cambia
 
-## File da copiare nel repository GitHub
-Copia mantenendo le cartelle:
+- In alto, nella barra docente, compare il selettore **Classe attiva**.
+- La classe scelta viene salvata nel browser e mantenuta passando tra Dashboard, Mappa, Playlist, Indovina e Gestione classe.
+- La Dashboard mostra esclusivamente dati e brani della classe selezionata.
+- La Mappa musicale usa esclusivamente gli studenti e i brani della classe selezionata.
+- Il gioco Indovina usa esclusivamente i brani della classe selezionata.
+- Playlist studenti mostra solo gli studenti della classe selezionata.
+- Gestione classe mostra gli studenti della classe selezionata e permette di aggiungere studenti a una nuova classe digitandone il nome.
+- La classe selezionata viene mantenuta anche tornando alla Dashboard.
+- Viene aggiunta l'API per recuperare le classi disponibili e le API filtrate per classe.
 
-- `app/page.tsx`
-- `app/globals.css`
-- `app/components/NowPlaying.tsx`
-- `app/api/now-playing/route.ts`
-- `app/docente/components/TeacherNav.tsx`
-- `app/docente/classe/page.tsx`
-- `app/docente/classe/gestione/page.tsx`
-- `app/docente/mappa/page.tsx`
-- `app/docente/indovina/page.tsx`
-- `middleware.ts`
+## Installazione
 
-Non modificare variabili Vercel, Supabase o `tsconfig.json`.
+Sostituire i file della patch nelle rispettive cartelle del progetto GitHub e fare commit su `main`.
 
-## Nota
-Il player usa i link YouTube già presenti nel database. L'autoplay con audio può essere bloccato dalle impostazioni del browser: in quel caso basta premere **Ascolta**. Questo è un comportamento normale dei browser moderni.
+Non modificare le variabili Vercel né la configurazione Supabase.
+
+Non serve cambiare lo schema del database: viene utilizzato il campo `studenti.classe` già presente.
+
+## Primo utilizzo
+
+1. Entrare nell'area docente.
+2. Scegliere una classe dal menu **Classe attiva**.
+3. Da quel momento tutte le pagine lavoreranno su quella classe.
+4. Per cambiare classe basta usare nuovamente il menu in alto.
+
+Se non è ancora presente nessuna classe, entrare in **Gestione classe**, digitare il nome della nuova classe e aggiungere gli studenti.

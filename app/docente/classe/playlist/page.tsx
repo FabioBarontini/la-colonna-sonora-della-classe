@@ -1,0 +1,34 @@
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft, ExternalLink, ListMusic, Music2, Search, UserRound } from "lucide-react";
+import TeacherNav from "../../components/TeacherNav";
+import ClassGate from "../../components/ClassGate";
+import { useTeacherClass } from "../../components/TeacherClassContext";
+
+type Song = { id:string; titolo:string; artista:string; youtube_url:string; motivo:string; genere?:string|null; anno?:number|null };
+type Student = { id:string; nome:string; classe:string; attivo:boolean; songs:Song[] };
+
+export default function PlaylistStudentiPage(){
+  const { selectedClass } = useTeacherClass();
+  const [students,setStudents]=useState<Student[]>([]),[selectedId,setSelectedId]=useState(""),[search,setSearch]=useState(""),[classe,setClasse]=useState("Tutte"),[loading,setLoading]=useState(true),[error,setError]=useState("");
+  useEffect(()=>{if(!selectedClass){setLoading(false);return;} setLoading(true); fetch(`/api/class/playlists?classe=${encodeURIComponent(selectedClass)}`,{cache:"no-store"}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"Errore");setStudents(d.students??[]);if(d.students?.length)setSelectedId(d.students[0].id)}).catch(e=>setError(e.message||"Errore nel caricamento.")).finally(()=>setLoading(false))},[selectedClass]);
+  const classes=useMemo(()=>["Tutte",...Array.from(new Set(students.map(s=>s.classe))).sort()],[students]);
+  const filtered=useMemo(()=>{const q=search.trim().toLowerCase();return students.filter(s=>(classe==="Tutte"||s.classe===classe)&&(!q||s.nome.toLowerCase().includes(q)||s.classe.toLowerCase().includes(q)))},[students,search,classe]);
+  const selected=students.find(s=>s.id===selectedId)??filtered[0]??null;
+  useEffect(()=>{if(filtered.length&&!filtered.some(s=>s.id===selectedId))setSelectedId(filtered[0].id)},[filtered,selectedId]);
+  return <main className="min-h-screen py-7 md:py-9"><div className="container"><TeacherNav/>
+    <ClassGate/>
+    <div className="mt-10 flex flex-wrap items-end justify-between gap-5"><div><div className="eyebrow">Archivio musicale</div><h1 className="mt-2 text-5xl font-black tracking-[-.05em]">Le playlist <span className="gradient-text">della classe.</span></h1><p className="mt-3 max-w-2xl muted">Scegli uno studente della classe selezionata e guarda la sua selezione completa: canzoni, storie e ricordi.</p></div><Link href="/docente/classe" className="btn-ghost print-hidden"><ArrowLeft size={15}/> Dashboard</Link></div>
+    {error&&<div className="mt-6 rounded-2xl border border-rose-300/15 bg-rose-400/10 px-5 py-4 text-sm text-rose-200">{error}</div>}
+    {loading?<div className="glass mt-7 p-8 muted">Caricamento delle playlist…</div>:<div className="mt-7 grid gap-6 lg:grid-cols-[360px_1fr]">
+      <aside className="glass p-5 lg:sticky lg:top-24 lg:h-fit"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-400/10 text-violet-300"><UserRound size={19}/></div><div><div className="eyebrow">Seleziona</div><div className="font-bold">Uno studente</div></div></div>
+        <div className="relative mt-5"><Search size={16} className="absolute left-3 top-3.5 text-[#777b91]"/><input value={search} onChange={e=>setSearch(e.target.value)} className="field pl-10" placeholder="Cerca studente…"/></div>
+        <div className="mt-3 flex flex-wrap gap-2">{classes.map(c=><button key={c} onClick={()=>setClasse(c)} className={`pill cursor-pointer transition ${classe===c?"border-violet-300/30 bg-violet-400/15 text-white":""}`}>{c}</button>)}</div>
+        <div className="mt-5 max-h-[55vh] space-y-2 overflow-y-auto pr-1">{filtered.length===0?<p className="px-2 py-5 text-sm muted">Nessuno studente trovato.</p>:filtered.map(s=>{const active=selected?.id===s.id;return <button key={s.id} onClick={()=>setSelectedId(s.id)} className={`w-full rounded-2xl border p-4 text-left transition ${active?"border-violet-300/30 bg-violet-400/10 shadow-[0_12px_35px_rgba(100,80,220,.12)]":"border-white/7 bg-white/[.025] hover:border-white/15 hover:bg-white/[.05]"}`}><div className="flex items-center justify-between gap-3"><div className="min-w-0"><div className="truncate font-semibold">{s.nome}</div><div className="mt-1 text-xs muted">{s.classe}</div></div><span className="shrink-0 rounded-lg bg-white/6 px-2 py-1 text-xs muted">{s.songs.length} brani</span></div></button>})}</div>
+      </aside>
+      <section className="glass overflow-hidden">{!selected?<div className="p-10 text-center"><ListMusic className="mx-auto text-violet-300" size={34}/><h2 className="mt-4 text-2xl font-bold">Seleziona uno studente</h2><p className="mt-2 muted">La playlist apparirà qui.</p></div>:<><div className="border-b border-white/8 bg-[radial-gradient(circle_at_20%_20%,rgba(155,124,255,.16),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(84,214,255,.11),transparent_35%)] p-6 md:p-8"><div className="flex flex-wrap items-start justify-between gap-5"><div className="flex items-center gap-4"><div className="cover flex h-16 w-16 items-center justify-center"><Music2 size={28}/></div><div><div className="eyebrow">Playlist personale</div><h2 className="mt-1 text-3xl font-black">{selected.nome}</h2><p className="mt-1 muted">{selected.classe} · {selected.songs.length} {selected.songs.length===1?"brano":"brani"}</p></div></div><span className="pill">{selected.songs.length>=5?"Playlist completa":`${selected.songs.length}/5 brani`}</span></div></div>
+        <div className="p-5 md:p-7">{selected.songs.length===0?<div className="rounded-2xl border border-dashed border-white/10 p-8 text-center muted">Questo studente non ha ancora inserito canzoni.</div>:<div className="space-y-3">{selected.songs.map((song,i)=><article key={song.id} className="music-card p-4 md:p-5"><div className="flex gap-4"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 font-mono text-xs text-violet-200">{String(i+1).padStart(2,"0")}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-lg font-bold">{song.titolo}</h3><p className="mt-0.5 text-sm text-cyan-200/80">{song.artista}</p></div><a href={song.youtube_url} target="_blank" rel="noreferrer" className="btn-ghost shrink-0"><span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-400/10 text-rose-200">▶</span><span className="hidden sm:inline">Apri brano</span><ExternalLink size={13}/></a></div>{song.motivo&&<p className="mt-4 rounded-xl bg-black/10 px-4 py-3 text-sm leading-6 text-[#b9bbca]">“{song.motivo}”</p>}{(song.genere||song.anno)&&<div className="mt-3 flex flex-wrap gap-2">{song.genere&&<span className="pill">{song.genere}</span>}{song.anno&&<span className="pill">{song.anno}</span>}</div>}</div></div></article>)}</div>}</div></>}</section>
+    </div>}
+  </div></main>
+}
