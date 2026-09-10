@@ -1,11 +1,18 @@
-# WOW4 Multi-classe – FIX3
+# Patch Home – Player per classe
 
-Correzione della Mappa musicale.
+Questa patch modifica esclusivamente il player musicale della homepage.
 
-Sostituire SOLO:
+## Sostituire
+- `app/components/NowPlaying.tsx`
+- `app/api/now-playing/route.ts`
 
-`app/docente/mappa/page.tsx`
+## Aggiungere
+- `app/api/classes/route.ts`
 
-La correzione elimina l'ultimo riferimento al campo inesistente `s.title` e usa correttamente `s.titolo`, coerente con la tabella `canzoni`.
-
-Non modificare Supabase, tsconfig, middleware o variabili Vercel.
+## Comportamento
+- Prima di ascoltare viene scelta una classe.
+- Il player pesca casualmente un brano solo da quella classe.
+- Non mostra mai il nome dello studente che ha scelto il brano.
+- La classe scelta viene ricordata sul browser.
+- Pausa/riproduzione e ultimo brano restano locali al singolo browser.
+- Non sono richieste modifiche a Supabase o alle variabili Vercel.
