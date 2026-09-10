@@ -1,15 +1,29 @@
 {
   "name": "class-soundtrack",
   "private": true,
-  "scripts": {"dev":"next dev","build":"next build","start":"next start","lint":"next lint"},
-  "dependencies": {
-    "@supabase/ssr":"latest",
-    "@supabase/supabase-js":"latest",
-    "next":"latest",
-    "react":"latest",
-    "react-dom":"latest",
-    "lucide-react":"latest",
-    "recharts":"latest"
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "devDependencies": {"typescript":"latest","@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","tailwindcss":"latest","postcss":"latest","autoprefixer":"latest"}
+  "dependencies": {
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "lucide-react": "latest",
+    "recharts": "latest",
+    "tailwindcss": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "postcss": "latest",
+    "@tailwindcss/postcss": "latest"
+  }
 }

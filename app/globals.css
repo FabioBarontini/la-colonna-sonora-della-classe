@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root { --bg:#f7f7f5; --ink:#171717; --muted:#737373; --card:#fff; --line:#e6e3dd; --accent:#111; }
 * { box-sizing:border-box }
