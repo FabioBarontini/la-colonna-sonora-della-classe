@@ -20,6 +20,28 @@ type Song = {
 
 type Student = { id: string; nome: string; classe: string };
 
+
+function getYouTubeEmbedUrl(url: string) {
+  if (!url) return null;
+
+  try {
+    const u = new URL(url);
+    let id = "";
+
+    if (u.hostname.includes("youtu.be")) {
+      id = u.pathname.replace("/", "").split("/")[0];
+    } else if (u.hostname.includes("youtube.com")) {
+      if (u.pathname === "/watch") id = u.searchParams.get("v") || "";
+      else if (u.pathname.startsWith("/shorts/")) id = u.pathname.split("/")[2] || "";
+      else if (u.pathname.startsWith("/embed/")) id = u.pathname.split("/")[2] || "";
+    }
+
+    return id ? `https://www.youtube.com/embed/${id}?rel=0` : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Game() {
   const { selectedClass } = useTeacherClass();
   const [songs, setSongs] = useState<Song[]>([]);
@@ -29,6 +51,7 @@ export default function Game() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(0);
+  const embedUrl = q ? getYouTubeEmbedUrl(q.youtube_url) : null;
 
   useEffect(() => {
     if (!selectedClass) {
@@ -124,6 +147,28 @@ export default function Game() {
                 </div>
               </div>
             </div>
+
+
+            {embedUrl && (
+              <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-black/30 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-[.18em] text-violet-200">
+                    <Music2 size={14} /> Ascolta il brano
+                  </div>
+                  <span className="text-xs muted">YouTube</span>
+                </div>
+                <div className="aspect-video w-full">
+                  <iframe
+                    key={embedUrl}
+                    src={embedUrl}
+                    title={`Ascolta ${q.titolo} di ${q.artista}`}
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {opts.map(name => (
